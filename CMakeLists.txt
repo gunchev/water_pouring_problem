@@ -131,15 +131,16 @@ endif()
 
 
 # Threads library
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
 # Find all third party packages
 find_package(fmt REQUIRED)
+
 include_directories(${FMT_INCLUDE_DIR})
 
-# binaries
+include_directories(src)
+
 add_executable(water src/water.cpp)
 target_link_libraries(water PRIVATE fmt::fmt) # Threads::Threads)
 install(TARGETS water DESTINATION bin)
