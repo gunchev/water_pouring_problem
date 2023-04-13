@@ -11,8 +11,8 @@ import sys
 
 @total_ordering
 class VesselsState:
-    '''Immutable object representing the volume of water in three vessels'''
-    # In reality it is mutable but mutating it will break sets and dictionaries using it as key.
+    """Immutable object representing the volume of water in three vessels"""
+    # In reality, it is mutable but mutating it will break sets and dictionaries using it as key.
     __slots__ = ['__a', '__b', '__c']  # Save some memory, we will have a lot of these, 56 bytes each
 
     def __init__(self, i: int, j: int, k: int):
@@ -48,13 +48,13 @@ class VesselsState:
 
 
 class Actor:
-    '''The person playing the game ;-)'''
+    """The person playing the game ;-)"""
 
     def __init__(self, limits: VesselsState):
         self._limits = tuple(limits)  # Easier to use this way
 
     def transfer(self, vessels: VesselsState, src: int, dst: int) -> VesselsState:
-        '''Transfer water from one vessel to another and return the new state'''
+        """Transfer water from one vessel to another and return the new state"""
         result = list(vessels)
         to_move = min(result[src], self._limits[dst] - result[dst])
         result[dst] += to_move
@@ -62,7 +62,7 @@ class Actor:
         return VesselsState(*result)
 
     def next_states(self, state: VesselsState) -> Iterable[VesselsState]:
-        '''Generate next possible states'''
+        """Generate next possible states"""
         for src in range(3):
             new_state: List[int]
             # Fill (up to 3 if all empty)
@@ -84,7 +84,7 @@ class Actor:
 
 
 class PuzzleStep:  # pylint: disable=too-few-public-methods
-    '''Step in the puzzle solution history'''
+    """Step in the puzzle solution history"""
     __slots__ = ['state', 'prev']  # Save some memory, we will have quite a lot of these, 48 bytes
 
     def __init__(self, state: VesselsState, prev: int):
@@ -98,7 +98,7 @@ class PuzzleStep:  # pylint: disable=too-few-public-methods
 
 
 class Puzzle:  # pylint: disable=too-few-public-methods
-    '''Measuring volume of water using three vessels puzzle.'''
+    """Measuring volume of water using three vessels puzzle."""
     INVALID_IDX = -1
 
     def __init__(self, limits: VesselsState):
@@ -108,7 +108,7 @@ class Puzzle:  # pylint: disable=too-few-public-methods
         self._history: List[PuzzleStep] = []
 
     def solve(self, target: int) -> bool:
-        '''Solve the puzzle for target volume of water'''
+        """Solve the puzzle for target volume of water"""
         if target == 0:
             print("All vessels are empty initially, all have 0 liters of water, 0 steps!")
             return True
@@ -146,7 +146,7 @@ class Puzzle:  # pylint: disable=too-few-public-methods
         return False
 
     def _show_current_solution(self, target: int, steps: int):
-        '''Show/print the current solution'''
+        """Show/print the current solution"""
         assert steps > 0
         assert len(self._history) != 0
 
@@ -170,13 +170,13 @@ class Puzzle:  # pylint: disable=too-few-public-methods
 
         for step, idx in enumerate(solution):
             data = tuple(self._history[idx].state)
-            print(f"| {step: >3}. | {data[0]: >3} | {data[1]: >3} | {data[2]: >3} |".format(*data))
+            print(f"| {step: >3}. | {data[0]: >3} | {data[1]: >3} | {data[2]: >3} |")
 
         print("+------+-----+-----+-----+")
 
 
 def main():
-    '''Main method'''
+    """Main method"""
     if len(sys.argv) != 5:
         print(__doc__, file=sys.stderr)  # @UndefinedVariable
         print(f"\nUsage:\n\t{sys.argv[0]} LIMIT_1 LIMIT_2 LIMIT_3 TARGET", file=sys.stderr)

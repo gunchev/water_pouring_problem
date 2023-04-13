@@ -34,6 +34,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 # Library directory - lib or lib64?
 # rpm: '%{?_cmake_lib_suffix64}' - https://src.fedoraproject.org/rpms/kid3/blob/rawhide/f/kid3.spec
 # https://gitlab.kitware.com/cmake/cmake/-/merge_requests/2558
+# rpmbuild --showrc | grep_cmake_lib_suffix64
 if (NOT LIB_SUFFIX)
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(LIB_SUFFIX "")
@@ -93,6 +94,16 @@ set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_OLD})
 unset(CMAKE_REQUIRED_QUIET_OLD)
 
 
+
+# clang-tidy
+set(CMAKE_CXX_CLANG_TIDY
+  clang-tidy;
+  -header-filter=.;
+  # -checks=*;
+  # -warnings-as-errors=*;
+)
+
+
 # Linker flags
 # http://wiki.gentoo.org/wiki/Project:Quality_Assurance/As-needed
 # http://www.bnikolic.co.uk/blog/gnu-ld-as-needed.html ,--no-undefined,--no-allow-shlib-undefined
@@ -120,16 +131,6 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL               "-Os -ggdb3 -D_FORTIFY_SOURCE=2 -DN
 
 
 
-# Enable testing?
-if(CPPUNIT_FOUND)
-    enable_testing()
-    include(CTest)
-    find_program(CTEST_COVERAGE_COMMAND NAMES gcov)
-    find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
-    add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
-endif()
-
-
 # Threads library
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
@@ -139,8 +140,12 @@ find_package(fmt REQUIRED)
 
 include_directories(${FMT_INCLUDE_DIR})
 
+# include(FindPkgConfig)
+# pkg_check_modules(HIREDIS REQUIRED hiredis>=1.0.2)
+
+
 include_directories(src)
 
-add_executable(water src/water.cpp)
+add_executable(water src/water.cpp src/utils.h)
 target_link_libraries(water PRIVATE fmt::fmt) # Threads::Threads)
 install(TARGETS water DESTINATION bin)

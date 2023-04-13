@@ -1,7 +1,6 @@
+#include <algorithm>
 #include <array>
 #include <cassert>
-#include <cstddef>
-#include <cstdint>
 #include <fmt/core.h>
 #include <limits>
 #include <sysexits.h>
@@ -30,20 +29,22 @@ public:
     };
 
     /// Return new state after transferring water
-    VesselsState transfer(unsigned from, unsigned to, const VesselsState &volumes) const noexcept {
+    [[nodiscard]]
+    VesselsState transfer(unsigned src, unsigned dst, const VesselsState &volumes) const noexcept {
         VesselsState result = *this; // copy
-        const water dst_free = volumes.at(to) - this->at(to);
-        if (this->at(from) <= dst_free) {
-            result.at(to) += this->at(from);
-            result.at(from) = 0;
+        const water dst_free = volumes.at(dst) - this->at(dst);
+        if (this->at(src) <= dst_free) {
+            result.at(dst) += this->at(src);
+            result.at(src) = 0;
         } else {
-            result.at(to) += dst_free;
-            result.at(from) -= dst_free;
+            result.at(dst) += dst_free;
+            result.at(src) -= dst_free;
         }
         return result;
     }
 
     /// Calculate all possible next states
+    [[nodiscard]]
     std::vector<VesselsState> next_states(const VesselsState &volumes) const {
         std::vector<VesselsState> result;
         result.reserve(12); // up to 12, use only 1 memory allocation
@@ -76,6 +77,7 @@ public:
     }
 
     // Do we contain the specified volume of water in any vessel?
+    [[nodiscard]]
     constexpr bool contains(water volume) const noexcept {
         return this->at(0) == volume || this->at(1) == volume || this->at(2) == volume;
     }
@@ -129,16 +131,16 @@ public:
         while (old_ptr != m_history.size()) {
             ++step;
 
-            size_t next_ptr = m_history.size();
-            for (size_t p = old_ptr; p < next_ptr; ++p) {
-                const VesselsState &old_state = m_history.at(p).first;
+            const size_t next_ptr = m_history.size();
+            for (size_t ptr = old_ptr; ptr < next_ptr; ++ptr) {
+                const VesselsState &old_state = m_history.at(ptr).first;
 
-                for (VesselsState new_state : old_state.next_states(m_volumes)) {
+                for (const VesselsState new_state : old_state.next_states(m_volumes)) {
                     if (m_visited.find(new_state) != m_visited.end()) {
                         continue;
                     }
                     m_visited.insert(new_state);
-                    m_history.emplace_back(new_state, p);
+                    m_history.emplace_back(new_state, ptr);
 
                     if (new_state.contains(target)) {
                         show(target, step);
@@ -168,7 +170,7 @@ protected:
         if (steps <= 0) {
             return;
         }
-        assert(m_history.size() != 0);
+        assert(!m_history.empty());
 
         fmt::print("Solved measure {} liters of water using {}, {} and {} vessels in {} steps\n", target,
                    m_volumes.at(0), m_volumes.at(1), m_volumes.at(2), steps);
@@ -192,7 +194,7 @@ protected:
             } else {
                 assert(history_idx >= 0);
             }
-        };
+        }
 
         for (int i = 0; i != steps + 1; ++i) {
             const VesselsState &state = m_history.at(static_cast<size_t>(solution.at(static_cast<size_t>(i)))).first;
@@ -215,24 +217,24 @@ int main(int argc, char *argv[]) {
     water target = 0;
 
     { // Use some stack memory temporary
-        water numbers[5] = {0, };
+        water numbers[5] = {};
         for (int i = 1; i < 5; ++i) {
-            char *end;
-            long result = strtol(argv[i], &end, 10);
+            char *end = nullptr;
+            const long result = strtol(argv[i], &end, 10);
             numbers[i] = static_cast<water>(result);
             if (end == argv[i] || *end != '\0' || numbers[i] != result) {
                 fmt::print("Invalid number (argument {}): '{}'!\n", i, argv[i]);
                 return EX_DATAERR;
             }
         }
-        sort3(numbers[3], numbers[2], numbers[1]); // Not really needed
+        std::sort(&numbers[1], &numbers[3]); // Not really needed
         volumes = VesselsState(numbers[1], numbers[2], numbers[3]);
         target = numbers[4];
     }
 
     // Quick check
     const auto volume_gcd = gcd(volumes.at(0), volumes.at(1), volumes.at(2));
-    fmt::print("GCD indicates the puzzle is {}solvable!\n", (target % volume_gcd ? "un" : ""));
+    fmt::print("GCD indicates the puzzle is {}solvable!\n", (target % volume_gcd != 0 ? "un" : ""));
 
     // Try to solve it
     WaterPouringPuzzleSolver solver{volumes};

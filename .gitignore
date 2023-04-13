@@ -74,3 +74,8 @@ Thumbs.db
 
 /build
 /CMakeLists.txt.user
+
+.idea/
+Pipfile
+Pipfile.lock
+/cmake-build-*/
