@@ -11,8 +11,8 @@ import sys
 
 @total_ordering
 class VesselsState:
-    """Immutable object representing the volume of water in three vessels"""
-    # In reality, it is mutable but mutating it will break sets and dictionaries using it as key.
+    """An immutable object representing the volume of water in three vessels."""
+    # In reality, it is mutable but mutating it will break sets and dictionaries using it as a key.
     __slots__ = ['__a', '__b', '__c']  # Save some memory, we will have a lot of these, 56 bytes each
 
     def __init__(self, i: int, j: int, k: int):
@@ -193,7 +193,7 @@ def main():
             print(f"Invalid input {i}!", file=sys.stderr)
             return 65  # EX_DATAERR
 
-    # Quick check for solvability
+    # Quick check for solvability.
     print(f'GCD indicates the puzzle is {"" if nums[3] % gcd(*nums[0:3]) == 0 else "un"}solvable!')
 
     limits = VesselsState(*nums[0:3])

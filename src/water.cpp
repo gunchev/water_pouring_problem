@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cstdint>
 #include <fmt/core.h>
 #include <limits>
 #include <sysexits.h>
@@ -79,6 +80,7 @@ public:
     // Do we contain the specified volume of water in any vessel?
     [[nodiscard]]
     constexpr bool contains(water volume) const noexcept {
+//        return std::find(this->begin(), this->end(), volume) != this->end(); // C++20
         return this->at(0) == volume || this->at(1) == volume || this->at(2) == volume;
     }
 };
@@ -213,8 +215,8 @@ int main(int argc, char *argv[]) {
         return EX_USAGE;
     }
 
-    VesselsState volumes{0, 0, 0};
-    water target = 0;
+    VesselsState volumes{};
+    water target{};
 
     { // Use some stack memory temporary
         water numbers[5] = {};
