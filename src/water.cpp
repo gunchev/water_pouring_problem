@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
     water target{};
 
     { // Use some stack memory temporary
-        water numbers[5] = {};
+        std::array<water, 5> numbers{};
         for (int i = 1; i < 5; ++i) {
             char *end = nullptr;
             const long result = strtol(argv[i], &end, 10);
