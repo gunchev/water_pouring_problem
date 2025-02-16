@@ -14,7 +14,7 @@ using water = uint16_t; // Water level measurement
 
 template <typename T>
 constexpr T type_max() noexcept {
-    return std::numeric_limits<water>::max();
+    return std::numeric_limits<T>::max();
 }
 
 /// Three water vessel's current contents in liters of water, the volumes must be kept in one more State variable.
