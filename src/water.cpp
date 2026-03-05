@@ -115,7 +115,7 @@ public:
     /// Returns in how many steps it can be solved (and prints it), -1 is no solution
     int solve_water(const water target) {
         if (target == 0) {
-            puts("All vessels are empty initially, all have 0 liters of water, 0 steps!");
+            puts("All vessels are empty initially, all have 0 liters of water, 0 steps!"); // puts() for fixed strings: no formatting overhead
             return 0;
         }
 
