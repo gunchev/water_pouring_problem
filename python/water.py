@@ -13,10 +13,10 @@ import sys
 class VesselsState:
     """An immutable object representing the volume of water in three vessels."""
     # In reality, it is mutable but mutating it will break sets and dictionaries using it as a key.
-    __slots__ = ['__a', '__b', '__c']  # Save some memory, we will have a lot of these, 56 bytes each
+    __slots__ = ['_a', '_b', '_c']  # Save some memory, we will have a lot of these, 56 bytes each
 
     def __init__(self, i: int, j: int, k: int):
-        self.__a, self.__b, self.__c = i, j, k
+        self._a, self._b, self._c = i, j, k
         # Can skip on production for speed
         for val in (i, j, k):
             if not isinstance(val, int):
@@ -25,9 +25,9 @@ class VesselsState:
                 raise ValueError(f'invalid water volume of {val}')
 
     def __iter__(self):
-        yield self.__a
-        yield self.__b
-        yield self.__c
+        yield self._a
+        yield self._b
+        yield self._c
 
     def __getitem__(self, val):
         return tuple(self)[val]
@@ -39,10 +39,10 @@ class VesselsState:
         return tuple(self) < tuple(other)
 
     def __hash__(self):
-        return hash((self.__a, self.__b, self.__c))
+        return hash((self._a, self._b, self._c))
 
     def __str__(self):
-        return f'{type(self).__name__}<{self.__a}, {self.__b}, {self.__c}>'
+        return f'{type(self).__name__}<{self._a}, {self._b}, {self._c}>'
 
     __repr__ = __str__
 
