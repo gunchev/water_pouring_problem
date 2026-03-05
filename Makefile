@@ -8,7 +8,8 @@ help:
 	@echo "▀▀▀▀▀▀"
 	@echo
 	@echo "Available targets:"
-	@echo "    debug:       Build debug binary, default."
+	@echo "    help:        This help message, default."
+	@echo "    debug:       Build debug binary."
 	@echo "    release:     Build optimized release binary."
 	@echo
 	@echo "    clean:              Clean all generated files."
