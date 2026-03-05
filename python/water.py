@@ -21,7 +21,7 @@ class VesselsState:
         for val in (i, j, k):
             if not isinstance(val, int):
                 raise TypeError(f'invalid water volume type {type(val).__name__}')
-            if val < 0 or not isinstance(val, int):
+            if val < 0:
                 raise ValueError(f'invalid water volume of {val}')
 
     def __iter__(self):
