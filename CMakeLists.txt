@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20.0)  # RHEL 8
+cmake_minimum_required(VERSION 3.20...3.31)
 
 project(water_pouring_problem
         VERSION 1.4.2.0 # PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH, PROJECT_VERSION_TWEAK.
@@ -24,46 +24,32 @@ set(${PROJECT_NAME}_SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 message("${PROJECT_NAME} VERSION ${PROJECT_VERSION} SOVERSION is ${${PROJECT_NAME}_SOVERSION}")
 
 # Build shared library by default
-if (NOT BUILD_SHARED_LIBS)
-    option(BUILD_SHARED_LIBS "Create shared libraries" ON)
-endif ()
+option(BUILD_SHARED_LIBS "Create shared libraries" ON)
 
 # Add link path(s) to RPATH in shared libraries and executables. Saves setting LD_LIBRARY_PATH each time...
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 
-# Library directory - lib or lib64?
-# rpm: '%{?_cmake_lib_suffix64}' - https://src.fedoraproject.org/rpms/kid3/blob/rawhide/f/kid3.spec
-# https://gitlab.kitware.com/cmake/cmake/-/merge_requests/2558
-# rpmbuild --showrc | grep_cmake_lib_suffix64
-if (NOT LIB_SUFFIX)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set(LIB_SUFFIX "")
-    else ()
-        set(LIB_SUFFIX 64)
-    endif ()
-endif ()
+# Standard install directories (handles lib vs lib64 automatically)
+include(GNUInstallDirs)
 
 # -fPIC on all targets
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 
-# Compiler/linker flags
+# Compiler warning flags
 if (EXISTS "/etc/fedora-release")
-    set(CMAKE_C_FLAGS "-Wall -Wextra")
-    set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+    add_compile_options(-Wall -Wextra)
 else ()
-    set(CMAKE_C_FLAGS "-Wall -Wextra -Werror")
-    set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
+    add_compile_options(-Wall -Wextra -Werror)
 endif ()
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
+include(CMakePushCheckState)
 
 # https://gcc.gnu.org/onlinedocs/gcc/Template-Instantiation.html#Template-Instantiation
 
-set(CMAKE_REQUIRED_QUIET_OLD ${CMAKE_REQUIRED_QUIET})
-set(CMAKE_REQUIRED_QUIET ON)
-macro(CheckAndAddFlag flag)
+function(CheckAndAddFlag flag)
     # We cannot check for -Wno-foo, check for -Wfoo, see https://stackoverflow.com/a/38786117/1136400 for details.
     string(REGEX REPLACE "^-Wno-" "-W" checkedFlag ${flag})
     string(REGEX REPLACE "[^A-Za-z0-9]" "_" varName ${checkedFlag})
@@ -73,14 +59,15 @@ macro(CheckAndAddFlag flag)
         set(C_CXX${varName}_CHECKED YES CACHE INTERNAL "")
     endif ()
     if (CXX_FLAG${varName}_SUPPORTED)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
+        add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${flag}>)
     endif ()
     if (C_FLAG${varName}_SUPPORTED)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${flag}")
+        add_compile_options($<$<COMPILE_LANGUAGE:C>:${flag}>)
     endif ()
-    unset(varName)
-    unset(checkedFlag)
-endmacro()
+endfunction()
+
+cmake_push_check_state(RESET)
+set(CMAKE_REQUIRED_QUIET ON)
 
 foreach (I IN ITEMS -fmessage-length=0 -fstack-protector-all -pedantic
         -Weffc++ -Wsign-compare -Wpointer-sign -Wpedantic -Wformat=2 -Wformat-security
@@ -90,18 +77,14 @@ foreach (I IN ITEMS -fmessage-length=0 -fstack-protector-all -pedantic
         -Wstrict-null-sentinel -Wswitch-default -Wundef -Wfloat-equal -Wstrict-overflow)
     CheckAndAddFlag(${I})
 endforeach ()
-set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_OLD})
-unset(CMAKE_REQUIRED_QUIET_OLD)
+
+cmake_pop_check_state()
 
 
-# clang-tidy, https://ortogonal.github.io/cmake-clang-tidy/
+# clang-tidy — configuration lives in .clang-tidy
+# https://ortogonal.github.io/cmake-clang-tidy/
 # https://www.kitware.com/static-checks-with-cmake-cdash-iwyu-clang-tidy-lwyu-cpplint-and-cppcheck/
-set(CMAKE_CXX_CLANG_TIDY
-        clang-tidy;
-        -header-filter=.;
-        -checks=*,-abseil-*,-altera-*,-android-*,-darwin-*,-llvm*,-linuxkernel-*,-misc-no-recursion,-objc-*,-readability-*,-zircon-*,-cppcoreguidelines-pro-type-vararg,-fuchsia-*;
-        # -warnings-as-errors=*;
-        )
+set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 set(CMAKE_LINK_WHAT_YOU_USE TRUE)
 
 # Linker flags
@@ -111,7 +94,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed")
 set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--no-as-needed")
 
 # Build target flags
-# Debug, CMAKE_C_FLAGS is prepended to CMAKE_C_FLAGS_DEBUG and so on, don't duplicate...
+# Debug, add_compile_options flags are combined with CMAKE_C_FLAGS_DEBUG and so on, don't duplicate...
 set(CMAKE_C_FLAGS_DEBUG "-O0 -ggdb3 -DDEBUG -fno-inline") # -fno-common -fno-omit-frame-pointer -fsanitize=address")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb3 -DDEBUG -fno-inline") # -fno-common -fno-omit-frame-pointer -fsanitize=address")
 #set(CMAKE_SHARED_LINKER_FLAGS_DEBUG          "")
@@ -130,21 +113,9 @@ set(CMAKE_C_FLAGS_MINSIZEREL "-Os -D_FORTIFY_SOURCE=2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -D_FORTIFY_SOURCE=2 -DNDEBUG")
 
 
-# Threads library
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
-
-# Find all third party packages
 find_package(fmt REQUIRED)
 
-include_directories(${FMT_INCLUDE_DIR})
-
-# include(FindPkgConfig)
-# pkg_check_modules(HIREDIS REQUIRED hiredis>=1.0.2)
-
-
-include_directories(src)
-
 add_executable(water src/water.cpp src/utils.h)
-target_link_libraries(water PRIVATE fmt::fmt) # Threads::Threads)
-install(TARGETS water DESTINATION bin)
+target_include_directories(water PRIVATE src)
+target_link_libraries(water PRIVATE fmt::fmt)
+install(TARGETS water DESTINATION ${CMAKE_INSTALL_BINDIR})
