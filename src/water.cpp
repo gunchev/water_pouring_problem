@@ -106,7 +106,6 @@ class WaterPouringPuzzleSolver {
     static constexpr int INVALID_IDX = -1;
 #endif
 
-protected:
     VesselsState m_volumes;
     History m_history{}; // State discovery history
     Visited m_visited{}; // States visited
@@ -157,7 +156,7 @@ public:
         return -1; // No new state transitions possible, no solution
     }
 
-protected:
+private:
     void init() {
         // Allow the method to be called multiple times
         m_history.clear();
