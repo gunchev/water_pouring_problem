@@ -27,7 +27,7 @@ public:
     /// Hash for unordered containers, c++ 23 it can even be static (__cpp_static_call_operator, P1169R3)
     constexpr size_t operator()(const VesselsState &state) const noexcept {
         return (size_t(state[0]) * (type_max<water>() + 1U) + state[1]) * (type_max<water>() + 1U) + state[2];
-    };
+    }
 
     /// Return new state after transferring water
     [[nodiscard]]
