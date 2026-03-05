@@ -35,3 +35,7 @@ release:
 .PHONY: clean
 clean:
 	rm -rf build
+
+
+.PHONY: dc
+dc: clean
