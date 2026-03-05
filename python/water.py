@@ -3,7 +3,7 @@
 
 """Solve the three water vessels, tap and sink problem."""
 
-from typing import List, Iterable, MutableSet
+from collections.abc import Iterable
 from functools import total_ordering
 from math import gcd
 import sys
@@ -64,7 +64,7 @@ class Actor:
     def next_states(self, state: VesselsState) -> Iterable[VesselsState]:
         """Generate next possible states"""
         for src in range(3):
-            new_state: List[int]
+            new_state: list[int]
             # Fill (up to 3 if all empty)
             if state[src] == 0:
                 new_state = list(state)
@@ -104,8 +104,8 @@ class Puzzle:  # pylint: disable=too-few-public-methods
     def __init__(self, limits: VesselsState):
         self._limits = limits
         self._actor = Actor(limits)
-        self._visited: MutableSet[VesselsState] = set()
-        self._history: List[PuzzleStep] = []
+        self._visited: set[VesselsState] = set()
+        self._history: list[PuzzleStep] = []
 
     def solve(self, target: int) -> bool:
         """Solve the puzzle for target volume of water"""
@@ -150,7 +150,7 @@ class Puzzle:  # pylint: disable=too-few-public-methods
         assert steps > 0
         assert len(self._history) != 0
 
-        solution: List[int] = [self.INVALID_IDX] * (steps + 1)
+        solution: list[int] = [self.INVALID_IDX] * (steps + 1)
         history_idx: int = len(self._history) - 1
         pos: int = steps
         while pos != self.INVALID_IDX:
