@@ -11,10 +11,12 @@ Solves the classic water pouring puzzle with three jugs, a tap, and a sink. Impl
 Out-of-source CMake build. Requires `fmt` library.
 
 ```bash
-cmake -B build -DCMAKE_BUILD_TYPE=Debug   # configure (once)
-cmake --build build                        # build
-./build/water 3 5 8 4                      # run
+cmake -B build/debug -DCMAKE_BUILD_TYPE=Debug   # configure (once)
+cmake --build build/debug                        # build
+./build/debug/water 3 5 8 4                      # run
 ```
+
+Or simply `make debug`. Use `make release` for an optimized build (`./build/release/water`).
 
 Build types: `Debug`, `DebugCov`, `RelWithDebInfo`, `Release`, `MinSizeRel`.
 

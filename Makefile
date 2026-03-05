@@ -9,10 +9,11 @@ help:
 	@echo
 	@echo "Available targets:"
 	@echo "    help:        This help message, default."
+	@echo
 	@echo "    debug:       Build debug binary."
 	@echo "    release:     Build optimized release binary."
 	@echo
-	@echo "    clean:              Clean all generated files."
+	@echo "    clean:       Clean all generated files."
 	@echo
 
 
@@ -21,14 +22,14 @@ all: debug
 
 .PHONY: debug
 debug:
-	cmake -B build -DCMAKE_BUILD_TYPE=Debug
-	cmake --build build
+	cmake -B build/debug -DCMAKE_BUILD_TYPE=Debug
+	cmake --build build/debug
 
 
 .PHONY: release
 release:
-	cmake -B build -DCMAKE_BUILD_TYPE=Release
-	cmake --build build
+	cmake -B build/release -DCMAKE_BUILD_TYPE=Release
+	cmake --build build/release
 
 
 .PHONY: clean
