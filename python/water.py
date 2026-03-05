@@ -50,43 +50,36 @@ class VesselsState:
     def __str__(self):
         return f'{type(self).__name__}<{self._a}, {self._b}, {self._c}>'
 
-    __repr__ = __str__
-
-
-class Actor:
-    """The person playing the game ;-)"""
-
-    def __init__(self, limits: VesselsState):
-        self._limits = tuple(limits)  # Easier to use this way
-
-    def transfer(self, vessels: VesselsState, src: int, dst: int) -> VesselsState:
+    def transfer(self, limits: 'VesselsState', src: int, dst: int) -> 'VesselsState':
         """Transfer water from one vessel to another and return the new state"""
-        result = list(vessels)
-        to_move = min(result[src], self._limits[dst] - result[dst])
+        result = list(self)
+        to_move = min(result[src], limits[dst] - result[dst])
         result[dst] += to_move
         result[src] -= to_move
         return VesselsState(*result)
 
-    def next_states(self, state: VesselsState) -> Iterable[VesselsState]:
+    def next_states(self, limits: 'VesselsState') -> Iterable['VesselsState']:
         """Generate next possible states"""
         for src in range(3):
             new_state: list[int]
             # Fill (up to 3 if all empty)
-            if state[src] == 0:
-                new_state = list(state)
-                new_state[src] = self._limits[src]
+            if self[src] == 0:
+                new_state = list(self)
+                new_state[src] = limits[src]
                 yield VesselsState(*new_state)
 
             # Drain (up to 3 if all non-empty)
-            if state[src] != 0:
-                new_state = list(state)
+            if self[src] != 0:
+                new_state = list(self)
                 new_state[src] = 0
                 yield VesselsState(*new_state)
 
             # Transfer (up to 6 if all non-empty and non-full)
             for dst in range(3):
-                if src != dst and state[dst] < self._limits[dst] and state[src] > 0:
-                    yield self.transfer(state, src, dst)
+                if src != dst and self[dst] < limits[dst] and self[src] > 0:
+                    yield self.transfer(limits, src, dst)
+
+    __repr__ = __str__
 
 
 class PuzzleStep:  # pylint: disable=too-few-public-methods
@@ -109,7 +102,6 @@ class Puzzle:  # pylint: disable=too-few-public-methods
 
     def __init__(self, limits: VesselsState):
         self._limits = limits
-        self._actor = Actor(limits)
         self._visited: set[VesselsState] = set()
         self._history: list[PuzzleStep] = []
 
@@ -136,7 +128,7 @@ class Puzzle:  # pylint: disable=too-few-public-methods
             for ptr in range(old_ptr, next_ptr):
                 old_state = self._history[ptr].state
 
-                for new_state in self._actor.next_states(old_state):
+                for new_state in old_state.next_states(self._limits):
                     if new_state in self._visited:
                         continue
 
