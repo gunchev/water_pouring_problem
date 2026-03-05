@@ -181,8 +181,7 @@ private:
         // If only the first solution is needed we can modify the history to reverse the index pointers and walk
         // forward.
 
-        std::vector<int> solution;
-        solution.resize(static_cast<size_t>(steps) + 1);
+        std::vector<int> solution(static_cast<size_t>(steps) + 1);
 
         int history_idx = static_cast<int>(m_history.size() - 1);
         for (int pos = steps; pos != -1; --pos) {
