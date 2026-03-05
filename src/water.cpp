@@ -229,6 +229,12 @@ int main(int argc, char *argv[]) {
                 return EX_DATAERR;
             }
         }
+        for (int i = 1; i < 4; ++i) {
+            if (numbers[i] == 0) {
+                fmt::print("Invalid jug capacity (argument {}): '{}'!\n", i, argv[i]);
+                return EX_DATAERR;
+            }
+        }
         std::sort(&numbers[1], &numbers[4]); // Not really needed, but slightly reduces the search space
         volumes = VesselsState(numbers[1], numbers[2], numbers[3]);
         target = numbers[4];
