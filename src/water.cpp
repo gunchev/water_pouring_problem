@@ -103,7 +103,7 @@ class WaterPouringPuzzleSolver {
 #if __cplusplus < 201703L
     enum { INVALID_IDX = -1 };
 #else
-    constexpr inline static const int INVALID_IDX = -1;
+    static constexpr int INVALID_IDX = -1;
 #endif
 
 protected:
