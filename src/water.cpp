@@ -73,7 +73,6 @@ public:
             }
         }
 
-        result.shrink_to_fit(); // And trim the unused part on the right (if any)
         return result;
     }
 
