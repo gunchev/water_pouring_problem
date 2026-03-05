@@ -17,8 +17,8 @@ constexpr T type_max() noexcept {
     return std::numeric_limits<T>::max();
 }
 
-/// Three water vessel's current contents in liters of water, the volumes must be kept in one more State variable.
-// Inherits comparison operators from std::array<T, S>()
+/// Represents the current water level in three vessels.
+/// Inherits comparison operators from std::array<water, 3>.
 class VesselsState: public std::array<water, 3> {
 public:
     constexpr VesselsState() noexcept: std::array<water, 3>({0, 0, 0}) {}
