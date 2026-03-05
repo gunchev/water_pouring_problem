@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
                 return EX_DATAERR;
             }
         }
-        std::sort(&numbers[1], &numbers[3]); // Not really needed
+        std::sort(&numbers[1], &numbers[4]); // Not really needed, but slightly reduces the search space
         volumes = VesselsState(numbers[1], numbers[2], numbers[3]);
         target = numbers[4];
     }
