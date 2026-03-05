@@ -80,7 +80,7 @@ public:
     // Do we contain the specified volume of water in any vessel?
     [[nodiscard]]
     constexpr bool contains(water volume) const noexcept {
-//        return std::find(this->begin(), this->end(), volume) != this->end(); // C++20
+//        return std::find(this->begin(), this->end(), volume) != this->end(); // constexpr only in C++20
         return this->at(0) == volume || this->at(1) == volume || this->at(2) == volume;
     }
 };
