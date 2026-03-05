@@ -188,7 +188,7 @@ def main():
         print(exc, file=sys.stderr)
         return 65  # EX_DATAERR
 
-    for i in nums:
+    for i in nums[0:3]:
         if i <= 0:
             print(f"Invalid input {i}!", file=sys.stderr)
             return 65  # EX_DATAERR
