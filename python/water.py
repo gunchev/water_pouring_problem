@@ -178,7 +178,7 @@ class Puzzle:  # pylint: disable=too-few-public-methods
 def main():
     """Main method"""
     if len(sys.argv) != 5:
-        print(__doc__, file=sys.stderr)  # @UndefinedVariable
+        print(__doc__, file=sys.stderr)
         print(f"\nUsage:\n\t{sys.argv[0]} LIMIT_1 LIMIT_2 LIMIT_3 TARGET", file=sys.stderr)
         return 64  # EX_USAGE
 
