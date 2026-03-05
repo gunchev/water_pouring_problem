@@ -118,7 +118,7 @@ class Puzzle:  # pylint: disable=too-few-public-methods
         self._history.clear()
 
         self._visited.add(VesselsState(0, 0, 0))  # We don't want to empty all of them
-        self._visited.add(self._limits)  # We don't want to empty all of them
+        self._visited.add(self._limits)  # We don't want to fill all of them
 
         step: int = 0  # count the steps
         old_ptr: int = 0  # All elements [0 .. len(history)) are new
