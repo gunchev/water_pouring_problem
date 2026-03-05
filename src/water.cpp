@@ -181,22 +181,23 @@ private:
         // If only the first solution is needed we can modify the history to reverse the index pointers and walk
         // forward.
 
-        std::vector<int> solution(static_cast<size_t>(steps) + 1);
+        const size_t num_steps = static_cast<size_t>(steps);
+        std::vector<size_t> solution(num_steps + 1);
 
-        int history_idx = static_cast<int>(m_history.size() - 1);
-        for (int pos = steps; pos != -1; --pos) {
-            solution.at(static_cast<size_t>(pos)) = history_idx;                 // Save current
-            history_idx = m_history.at(static_cast<size_t>(history_idx)).second; // travel back
-
+        size_t history_idx = m_history.size() - 1;
+        for (size_t pos = num_steps; ; --pos) {
+            solution.at(pos) = history_idx;                        // Save current
+            const int prev = m_history.at(history_idx).second;    // travel back
             if (pos == 0) {
-                assert(history_idx == -1);
-            } else {
-                assert(history_idx >= 0);
+                assert(prev == -1);
+                break;
             }
+            assert(prev >= 0);
+            history_idx = static_cast<size_t>(prev);
         }
 
-        for (int i = 0; i != steps + 1; ++i) {
-            const VesselsState &state = m_history.at(static_cast<size_t>(solution.at(static_cast<size_t>(i)))).first;
+        for (size_t i = 0; i <= num_steps; ++i) {
+            const VesselsState &state = m_history.at(solution.at(i)).first;
             fmt::print("│ {: >3}. │ {: >3} │ {: >3} │ {: >3} │\n", i, state.at(0), state.at(1), state.at(2));
         }
         fmt::print("└──────┴─────┴─────┴─────┘\n");
