@@ -168,9 +168,9 @@ class Puzzle:  # pylint: disable=too-few-public-methods
         print(f"| Step | {self._limits[0]: >3} | {self._limits[1]: >3} | {self._limits[2]: >3} |")
         print("+------+-----+-----+-----+")
 
-        for step, idx in enumerate(solution):
+        for i, idx in enumerate(solution):
             data = tuple(self._history[idx].state)
-            print(f"| {step: >3}. | {data[0]: >3} | {data[1]: >3} | {data[2]: >3} |")
+            print(f"| {i: >3}. | {data[0]: >3} | {data[1]: >3} | {data[2]: >3} |")
 
         print("+------+-----+-----+-----+")
 
