@@ -30,7 +30,13 @@ class VesselsState:
         yield self._c
 
     def __getitem__(self, val):
-        return tuple(self)[val]
+        if val == 0:
+            return self._a
+        if val == 1:
+            return self._b
+        if val == 2:
+            return self._c
+        raise IndexError(val)
 
     def __eq__(self, other):
         return tuple(self) == tuple(other)
